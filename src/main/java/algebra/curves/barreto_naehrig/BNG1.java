@@ -130,6 +130,7 @@ public abstract class BNG1<
         if (isZero()) {
             return this.self();
         }
+        //System.out.println("hello");
 
         // No need to handle points of order 2,4
         // (they cannot exist in a modulus-order subgroup)

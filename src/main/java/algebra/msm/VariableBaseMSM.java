@@ -102,13 +102,9 @@ public class VariableBaseMSM {
         final ArrayList<GroupT> bucketsModel = new ArrayList<>(Collections.nCopies(numBuckets, zero));
 
         GroupT result = zero;
-
+        System.out.println("numBuckets = " + numBuckets +"c=" + c);
         for (int k = numGroups - 1; k >= 0; k--) {
-            if (k < numGroups - 1) {
-                for (int i = 0; i < c; i++) {
-                    result = result.twice();
-                }
-            }
+
 
             final ArrayList<GroupT> buckets = new ArrayList<>(bucketsModel);
 
@@ -127,13 +123,29 @@ public class VariableBaseMSM {
                 // Potentially use mixed addition here.
                 buckets.set(id, buckets.get(id).add(input.get(i)._2));
             }
-
+//------------------------------------------------------------------------------------------
             GroupT runningSum = zero;
 
             for (int i = numBuckets - 1; i > 0; i--) {
                 // Potentially use mixed addition here.
                 runningSum = runningSum.add(buckets.get(i));
                 result = result.add(runningSum);
+            }
+
+            // GroupT a = buckets.get(1).add(buckets.get(2));
+            // GroupT b = buckets.get(2).add(buckets.get(1));
+            // System.out.println("a = " + a.toString());
+            // System.out.println("b = " +b.toString());
+            // System.out.println("a == b ?" +a.equals(b));
+
+
+
+            //TODO lianke rewrite this prefix sum to binary logN format.
+
+            if (k > 0) {
+                for (int i = 0; i < c; i++) {
+                    result = result.twice();
+                }
             }
         }
 
@@ -155,19 +167,20 @@ public class VariableBaseMSM {
         int numBits = 0;
         for (int i = 0; i < bases.size(); i++) {
             final BigInteger scalar = scalars.get(i).toBigInteger();
-            if (scalar.equals(BigInteger.ZERO)) {
-                continue;
-            }
+            // if (scalar.equals(BigInteger.ZERO)) {
+            //     continue;
+            // }
 
             final GroupT base = bases.get(i);
 
-            if (scalar.equals(BigInteger.ONE)) {
-                acc = acc.add(base);
-            } else {
-                filteredInput.add(new Tuple2<>(scalar, base));
-                numBits = Math.max(numBits, scalar.bitLength());
-            }
+            // if (scalar.equals(BigInteger.ONE)) {
+            //     acc = acc.add(base);
+            // } else {
+            filteredInput.add(new Tuple2<>(scalar, base));
+            numBits = Math.max(numBits, scalar.bitLength());
+            // }
         }
+            System.out.println("numBits: " + numBits);
 
         if (!filteredInput.isEmpty()) {
             acc = acc.add(pippengerMSM(filteredInput, numBits));

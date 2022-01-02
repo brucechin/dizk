@@ -24,6 +24,7 @@ public class Fp2 extends AbstractFieldElement<Fp2> implements Serializable {
     }
 
     public Fp2(final BigInteger c0, final BigInteger c1, final AbstractFp2Parameters Fp2Parameters) {
+        System.out.println("Fp2 modulus: " + Fp2Parameters.FpParameters().modulus());
         this.c0 = new Fp(c0, Fp2Parameters.FpParameters());
         this.c1 = new Fp(c1, Fp2Parameters.FpParameters());
         this.Fp2Parameters = Fp2Parameters;
@@ -56,6 +57,7 @@ public class Fp2 extends AbstractFieldElement<Fp2> implements Serializable {
      Fields.pdf; Section 3 (Karatsuba) */
         final Fp c0C0 = c0.mul(that.c0);
         final Fp c1C1 = c1.mul(that.c1);
+        //System.out.println("nonresidue="+Fp2Parameters.nonresidue().toBigInteger());
         return new Fp2(
                 c0C0.add(Fp2Parameters.nonresidue().mul(c1C1)),
                 (c0.add(c1)).mul(that.c0.add(that.c1)).sub(c0C0).sub(c1C1),

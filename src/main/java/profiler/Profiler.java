@@ -12,7 +12,6 @@ public class Profiler {
 
     public static void serialApp(final String app, final Configuration config, final long size) {
         System.out.format("\n[Profiler] - Start Serial %s - %d size\n", SparkUtils.appName(app), size);
-
         if (app.equals("fft")) {
             FFTProfiling.serialFFTProfiling(config, size);
         } else if (app.equals("lagrange")) {

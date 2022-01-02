@@ -20,6 +20,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Iterator;
+import org.apache.commons.collections.IteratorUtils;
 
 public class FixedBaseMSM {
 
@@ -116,10 +118,26 @@ public class FixedBaseMSM {
         for (FieldT scalar : scalars) {
             res.add(serialMSM(scalarSize, windowSize, multiplesOfBase, scalar));
         }
-
+        System.out.println("finished");
         return res;
     }
 
+
+
+    public static <T extends AbstractGroup<T>, FieldT extends AbstractFieldElementExpanded<FieldT>>
+    List<Tuple2<Long, T>>  batchMSMPartition(
+            final int scalarSize,
+            final int windowSize,
+            final List<List<T>> multiplesOfBase,
+            final List<Tuple2<Long, FieldT>> scalars) {
+        final List<Tuple2<Long, T>> res = new ArrayList<>(scalars.size());
+
+        for (Tuple2<Long, FieldT> scalar : scalars) {
+            res.add(new Tuple2<>(scalar._1, serialMSM(scalarSize, windowSize, multiplesOfBase, scalar._2)));
+        }
+        System.out.println("finished");
+        return res;
+    }
     public static <GroupT extends AbstractGroup<GroupT>,
             FieldT extends AbstractFieldElementExpanded<FieldT>> JavaPairRDD<Long, GroupT>
     distributedBatchMSM(
@@ -129,8 +147,24 @@ public class FixedBaseMSM {
             final JavaPairRDD<Long, FieldT> scalars,
             final JavaSparkContext sc) {
 
-        final Broadcast<List<List<GroupT>>> baseBroadcast = sc.broadcast(multiplesOfBase);
+        long start1 = System.currentTimeMillis();
 
+        final Broadcast<List<List<GroupT>>> baseBroadcast = sc.broadcast(multiplesOfBase);
+        long finish1 = System.currentTimeMillis();
+        long timeElapsed1 = finish1 - start1;
+        System.out.println("Spark broadcast  time elapsed: " + timeElapsed1 + " ms");
+        // long start = System.currentTimeMillis();
+        // JavaPairRDD<Long, GroupT> true_result = scalars.mapPartitionsToPair(
+        //     partition ->  {
+        //         List<Tuple2<Long, FieldT>> scalar_partition = IteratorUtils.toList(partition);
+        //         List<Tuple2<Long, GroupT>> res =  batchMSMPartition(scalarSize, windowSize, baseBroadcast.getValue(), scalar_partition);
+        //         return res.iterator();
+        //     }
+        // );
+        // long finish = System.currentTimeMillis();
+        // long timeElapsed = finish - start;
+        // System.out.println("Spark processing time elapsed: " + timeElapsed + " ms");
+        // return true_result;
         return scalars.mapToPair(scalar -> new Tuple2<>(
                 scalar._1,
                 serialMSM(scalarSize, windowSize, baseBroadcast.getValue(), scalar._2)));

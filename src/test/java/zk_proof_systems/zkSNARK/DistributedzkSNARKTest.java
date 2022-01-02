@@ -62,7 +62,7 @@ public class DistributedzkSNARKTest implements Serializable {
 
         sc = new JavaSparkContext(conf);
 
-        config = new Configuration(1, 1, 1, 2, sc, StorageLevel.MEMORY_ONLY());
+        config = new Configuration(8, 16, 64, 16, sc, StorageLevel.MEMORY_ONLY());
         config.setRuntimeFlag(false);
         config.setDebugFlag(true);
     }
@@ -102,47 +102,47 @@ public class DistributedzkSNARKTest implements Serializable {
         final CRS<BNFrT, BNG1T, BNG2T, BNGTT> CRS =
                 DistributedSetup.generate(r1cs, fieldFactory, g1Factory, g2Factory, pairing, config);
 
-        final Proof<BNG1T, BNG2T> proof =
-                DistributedProver.prove(CRS.provingKeyRDD(), primary, fullAssignment, fieldFactory, config);
+        // final Proof<BNG1T, BNG2T> proof =
+        //         DistributedProver.prove(CRS.provingKeyRDD(), primary, fullAssignment, fieldFactory, config);
 
-        final boolean isValid = Verifier.verify(CRS.verificationKey(), primary, proof, pairing, config);
+        // final boolean isValid = Verifier.verify(CRS.verificationKey(), primary, proof, pairing, config);
 
-        System.out.println(isValid);
-        assertTrue(isValid);
+        // System.out.println(isValid);
+        // assertTrue(isValid);
     }
 
-    @Test
-    public void DistributedFakeProofSystemTest() {
-        final int numInputs = 1023;
-        final int numConstraints = 1024;
+//     @Test
+//     public void DistributedFakeProofSystemTest() {
+//         final int numInputs = 1023;
+//         final int numConstraints = 1024;
 
-        FakeInitialize.init();
-        final Fp fieldFactory = new FakeFqParameters().ONE();
-        final FakeG1 fakeG1Factory = new FakeG1Parameters().ONE();
-        final FakeG2 fakeG2Factory = new FakeG2Parameters().ONE();
-        final FakePairing fakePairing = new FakePairing();
+//         FakeInitialize.init();
+//         final Fp fieldFactory = new FakeFqParameters().ONE();
+//         final FakeG1 fakeG1Factory = new FakeG1Parameters().ONE();
+//         final FakeG2 fakeG2Factory = new FakeG2Parameters().ONE();
+//         final FakePairing fakePairing = new FakePairing();
 
-        final Tuple3<R1CSRelationRDD<Fp>, Assignment<Fp>, JavaPairRDD<Long, Fp>> construction =
-                R1CSConstruction.parallelConstruct(numConstraints, numInputs, fieldFactory, config);
-        final R1CSRelationRDD<Fp> r1cs = construction._1();
-        final Assignment<Fp> primary = construction._2();
-        final JavaPairRDD<Long, Fp> fullAssignment = construction._3();
+//         final Tuple3<R1CSRelationRDD<Fp>, Assignment<Fp>, JavaPairRDD<Long, Fp>> construction =
+//                 R1CSConstruction.parallelConstruct(numConstraints, numInputs, fieldFactory, config);
+//         final R1CSRelationRDD<Fp> r1cs = construction._1();
+//         final Assignment<Fp> primary = construction._2();
+//         final JavaPairRDD<Long, Fp> fullAssignment = construction._3();
 
-        final CRS<Fp, FakeG1, FakeG2, FakeGT> CRS = DistributedSetup.generate(r1cs, fieldFactory,
-                fakeG1Factory, fakeG2Factory, fakePairing, config);
-        final Proof<FakeG1, FakeG2> proof = DistributedProver.prove(CRS.provingKeyRDD(), primary,
-                fullAssignment, fieldFactory, config);
-        final boolean isValid = Verifier.verify(CRS.verificationKey(), primary, proof,
-                fakePairing, config);
+//         final CRS<Fp, FakeG1, FakeG2, FakeGT> CRS = DistributedSetup.generate(r1cs, fieldFactory,
+//                 fakeG1Factory, fakeG2Factory, fakePairing, config);
+//         final Proof<FakeG1, FakeG2> proof = DistributedProver.prove(CRS.provingKeyRDD(), primary,
+//                 fullAssignment, fieldFactory, config);
+//         final boolean isValid = Verifier.verify(CRS.verificationKey(), primary, proof,
+//                 fakePairing, config);
 
-        System.out.println(isValid);
-        assertTrue(isValid);
-    }
+//         System.out.println(isValid);
+//         assertTrue(isValid);
+//     }
 
     @Test
     public void DistributedBN254aProofSystemTest() {
         final int numInputs = 1023;
-        final int numConstraints = 1024;
+        final int numConstraints = 1048576;
         final BN254aFr fieldFactory = new BN254aFr(1);
         final BN254aG1 g1Factory = BN254aG1Parameters.ONE;
         final BN254aG2 g2Factory = BN254aG2Parameters.ONE;
@@ -151,15 +151,15 @@ public class DistributedzkSNARKTest implements Serializable {
         DistributedBNProofSystemTest(numInputs, numConstraints, fieldFactory, g1Factory, g2Factory, pairing);
     }
 
-    @Test
-    public void DistributedBN254bProofSystemTest() {
-        final int numInputs = 1023;
-        final int numConstraints = 1024;
-        final BN254bFr fieldFactory = new BN254bFr(1);
-        final BN254bG1 g1Factory = BN254bG1Parameters.ONE;
-        final BN254bG2 g2Factory = BN254bG2Parameters.ONE;
-        final BN254bPairing pairing = new BN254bPairing();
+//     @Test
+//     public void DistributedBN254bProofSystemTest() {
+//         final int numInputs = 1023;
+//         final int numConstraints = 1024;
+//         final BN254bFr fieldFactory = new BN254bFr(1);
+//         final BN254bG1 g1Factory = BN254bG1Parameters.ONE;
+//         final BN254bG2 g2Factory = BN254bG2Parameters.ONE;
+//         final BN254bPairing pairing = new BN254bPairing();
 
-        DistributedBNProofSystemTest(numInputs, numConstraints, fieldFactory, g1Factory, g2Factory, pairing);
-    }
+//         DistributedBNProofSystemTest(numInputs, numConstraints, fieldFactory, g1Factory, g2Factory, pairing);
+//     }
 }

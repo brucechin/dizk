@@ -110,6 +110,7 @@ public class DistributedProver {
         evaluationABC = evaluationABC.add(evaluationHtZt); // H(t)*Z(t)/delta
         config.endLog("Computing evaluation to query H");
 
+        
         // A = alpha + sum_i(a_i*A_i(t)) + r*delta
         final G1T A = alphaG1.add(evaluationAt).add(deltaG1.mul(r));
 
